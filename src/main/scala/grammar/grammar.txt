@@ -1,0 +1,26 @@
+expression
+unary
+binary
+literal
+grouping
+operator
+
+expression -> literal
+    | grouping
+    | unary
+    | binary
+
+grouping -> "(" + expression + ")"
+
+literal -> NUMBER
+    | STRING
+    | true
+    | false
+    | nil
+
+unary -> ("-" | "!") expression
+
+binary -> expression operator expression
+
+operator -> "+" "-" ... etc.
+

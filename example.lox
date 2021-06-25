@@ -1,0 +1,10 @@
+/**
+ * An example comment
+ * /** A nested comment */
+ */
+if (example) {
+  return 1
+}
+
+/** Inline comment */
+
