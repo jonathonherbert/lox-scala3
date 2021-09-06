@@ -14,7 +14,7 @@ object AstGenerator {
     defineAst("Expr", List(
       "Binary     :: left: Expr, operator: Token, right: Expr",
       "Grouping   :: expression: Expr",
-      "Literal    :: value: String | Number | Boolean",
+      "Literal    :: value: String | Double | Boolean",
       "Unary      :: operator: Token, right: Expr"
     ))
   }

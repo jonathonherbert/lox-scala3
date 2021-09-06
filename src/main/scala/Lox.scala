@@ -2,6 +2,8 @@ package lox
 
 import io.StdIn.readLine
 import scala.io.Source
+import scala.util.Success
+import scala.util.Failure
 
 class Lox:
   def runFile(fileName: String) =
@@ -15,6 +17,8 @@ class Lox:
   def run(program: String) =
     val scanner = new Scanner(program)
     val tokens = scanner.scanTokens
-    println(tokens.map(_.toString).mkString(",\n"))
-
-
+    val parser = new Parser(tokens)
+    parser.parse() match {
+      case Success(expr) => println(AstPrinter.exprToString(expr))
+      case Failure(e) => println(e.getMessage)
+    }

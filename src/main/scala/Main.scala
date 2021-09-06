@@ -4,12 +4,10 @@ import scala.util.CommandLineParser
 
 @main def main(args: String*) =
   val lox = new Lox
+  println(args)
   args.toList match
     case head::Nil =>
-      if (head == "print")
-        AstPrinter.main()
-      else
-        lox.runFile(head)
+      lox.runFile(head)
     case Nil =>
       lox.runPrompt()
     case _ =>

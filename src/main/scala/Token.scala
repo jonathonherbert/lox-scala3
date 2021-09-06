@@ -20,7 +20,7 @@ enum TokenType:
 
   EOF
 
-object Token {
+object Token:
   val reservedWords = Map(
     "and" ->   TokenType.AND,
     "class" -> TokenType.CLASS,
@@ -39,7 +39,7 @@ object Token {
     "var" ->   TokenType.VAR,
     "while" -> TokenType.WHILE,
   )
-}
+
 
 case class Token(tokenType: TokenType, lexeme: String, literal: Double | String | Null, line: Int):
   override def toString = s"${tokenType} ${lexeme} ${literal} ${line}"
