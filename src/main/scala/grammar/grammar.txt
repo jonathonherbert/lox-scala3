@@ -1,5 +1,6 @@
 program    -> statement* EOF
 statement  -> exprStmt | printStmt
+exprStmt   -> expression_list
 expression_list ->  expression (',' expression_list)
 expression -> equality
 equality   -> comparison (('==' | '!=' comparison)*

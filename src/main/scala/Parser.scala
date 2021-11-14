@@ -5,6 +5,7 @@ import lox.grammar.Binary
 import lox.grammar.Unary
 import lox.grammar.Literal
 import lox.grammar.Expr
+import lox.grammar.Stmt
 import lox.grammar.Grouping
 import scala.util.Try
 import scala.util.Success
@@ -29,6 +30,32 @@ class Parser(tokens: List[Token]):
 
   def parse(): Try[Expr] =
     Try { expressionList }
+
+  // program    -> statement* EOF
+  private def program =
+    var statements = List.empty[Stmt]
+    while (peek().tokenType != EOF) {
+      statements = statements :: statement
+    }
+    statements
+
+  // statement  -> exprStmt | printStmt
+  private def statement =
+    if (matchTokens(PRINT))
+      printStmt
+    exprStmt
+
+  // printStmt  -> "print" expression_list
+  private def printStmt =
+    val expr = expressionList
+    consume(SEMICOLON, "Expected an ';' after an expression.")
+    Print(expr)
+
+  // exprStmt   -> expression_list
+  private def exprStmt =
+    val expr = expressionList
+    consume(SEMICOLON, "Expected an ';' after an expression.")
+    expr
 
   // expression_list ->  expression (',' expression_list)
   private def expressionList: ExprList = 
