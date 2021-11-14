@@ -1,13 +1,14 @@
 package lox
 
-import lox.grammar.Binary
 import TokenType._
+import lox.grammar.Binary
 import lox.grammar.Unary
 import lox.grammar.Literal
 import lox.grammar.Expr
 import lox.grammar.Grouping
 import scala.util.Try
 import scala.util.Success
+import lox.grammar.ExprList
 
 class ParseError extends Exception
 
@@ -27,7 +28,15 @@ class Parser(tokens: List[Token]):
   val skipTypes = List(CLASS, FOR, FUN, IF, PRINT, RETURN, VAR, WHILE)
 
   def parse(): Try[Expr] =
-    Try { expression }
+    Try { expressionList }
+
+  // expression_list ->  expression (',' expression_list)
+  private def expressionList: ExprList = 
+    var expr = expression
+    if (matchTokens(COMMA))
+      ExprList(expr, Some(expressionList))
+    else
+      ExprList(expr)
 
   // expression -> equality
   private def expression = equality

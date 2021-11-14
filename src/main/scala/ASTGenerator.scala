@@ -12,10 +12,16 @@ object AstGenerator {
     val defineAst = getAstDefiner(directory)
 
     defineAst("Expr", List(
+      "ExprList   :: left: Expr, right: Option[ExprList] = None",
       "Binary     :: left: Expr, operator: Token, right: Expr",
       "Grouping   :: expression: Expr",
       "Literal    :: value: String | Double | Boolean",
       "Unary      :: operator: Token, right: Expr"
+    ))
+
+    defineAst("Stmt", List(
+      "Expression :: expr: Expr",
+      "Print      :: expr: Expr"
     ))
   }
 

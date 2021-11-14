@@ -19,6 +19,8 @@ class Lox:
     val tokens = scanner.scanTokens
     val parser = new Parser(tokens)
     parser.parse() match {
-      case Success(expr) => println(AstPrinter.exprToString(expr))
+      case Success(expr) =>
+        println(s"Parsed to ${AstPrinter.exprToString(expr)}")
+        println(s"Evaluated to ${Interpreter.evaluate(expr)}")
       case Failure(e) => println(e.getMessage)
     }
