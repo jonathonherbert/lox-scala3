@@ -1,11 +1,13 @@
-program    -> statement* EOF
-statement  -> exprStmt | printStmt
-exprStmt   -> expression_list
+program         -> declaration* EOF
+declaration     -> varDecl | statement
+varDecl         -> 'var' identifier ('=' expression)? ";"
+statement       -> exprStmt | printStmt 
+exprStmt        -> expression_list
 expression_list ->  expression (',' expression_list)
-expression -> equality
-equality   -> comparison (('==' | '!=' comparison)*
-comparison -> term (('>' | '>=' | '<' | '<=') term)*
-term       -> factor (("+" | "-") factor)*
-factor     -> unary (("/" | "*") unary)*
-unary      -> (("!" | "-") unary) | primary
-primary    -> number | string | true | false | Nil | "(" expression ")"
+expression      -> equality
+equality        -> comparison (('==' | '!=' comparison)*
+comparison      -> term (('>' | '>=' | '<' | '<=') term)*
+term            -> factor (("+" | "-") factor)*
+factor          -> unary (("/" | "*") unary)*
+unary           -> (("!" | "-") unary) | primary
+primary         -> number | string | true | false | Nil | "(" expression ")" | IDENTIFIER

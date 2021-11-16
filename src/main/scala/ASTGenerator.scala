@@ -16,12 +16,14 @@ object AstGenerator {
       "Binary     :: left: Expr, operator: Token, right: Expr",
       "Grouping   :: expression: Expr",
       "Literal    :: value: String | Double | Boolean",
+      "Variable   :: name: Token",
       "Unary      :: operator: Token, right: Expr"
     ))
 
     defineAst("Stmt", List(
       "Expression :: expr: Expr",
-      "Print      :: expr: Expr"
+      "Print      :: expr: Expr",
+      "VarDecl    :: name: Token, value: Expr"
     ))
   }
 

@@ -1,25 +1,26 @@
 package lox
 
 import TokenType._
-import lox.grammar.Binary
-import lox.grammar.Unary
-import lox.grammar.Literal
-import lox.grammar.Expr
-import lox.grammar.ExprList
-import lox.grammar.Grouping
+import lox.grammar._
 
 type LoxValue  = String | Double | Boolean
 
 class InterpreterError(message: String) extends Exception
 
 object Interpreter {
-	def evaluate(expr: Expr): LoxValue = expr match
+	def evaluate(program: List[Stmt]) = program.foreach {
+		case Expression(expr) => evaluateExpr
+		case Print(expr) => 
+			println(evaluateExpr(expr))
+	}
+
+	def evaluateExpr(expr: Expr): LoxValue = expr match
 		case ExprList(left, right) =>
-			val leftVal = evaluate(left)
-			right.map(evaluate).getOrElse(leftVal)
+			val leftVal = evaluateExpr(left)
+			right.map(evaluateExpr).getOrElse(leftVal)
 		case Binary(left, operator, right) =>
-			val leftVal = evaluate(left)
-			val rightVal = evaluate(right)
+			val leftVal = evaluateExpr(left)
+			val rightVal = evaluateExpr(right)
 			(operator.tokenType, leftVal, rightVal) match
 				case (EQUAL_EQUAL, l, r) => l == r
 				case (GREATER_EQUAL, l: Double, r: Double) =>
@@ -48,10 +49,10 @@ object Interpreter {
 				case (PLUS, l, r) =>
 					l.toString + r.toString
 				case _ => throw new InterpreterError(s"Cannot use operator ${operator.tokenType} with ${leftVal} and ${rightVal}")
-		case Grouping(expr) => evaluate(expr)
+		case Grouping(expr) => evaluateExpr(expr)
 		case Literal(value) => value
 		case Unary(operator, right) =>
-			val rightVal = evaluate(right)
+			val rightVal = evaluateExpr(right)
 			(operator.tokenType, rightVal) match
 				case (BANG, _) => !isTruthy(rightVal)
 				case (MINUS, r: Double) => -r

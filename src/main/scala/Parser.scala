@@ -1,15 +1,9 @@
 package lox
 
 import TokenType._
-import lox.grammar.Binary
-import lox.grammar.Unary
-import lox.grammar.Literal
-import lox.grammar.Expr
-import lox.grammar.Stmt
-import lox.grammar.Grouping
+import lox.grammar._
 import scala.util.Try
 import scala.util.Success
-import lox.grammar.ExprList
 
 class ParseError extends Exception
 
@@ -26,24 +20,41 @@ object Parser:
 
 class Parser(tokens: List[Token]):
   var current: Int = 0;
-  val skipTypes = List(CLASS, FOR, FUN, IF, PRINT, RETURN, VAR, WHILE)
+  val skipTypes = List(CLASS, FOR, FUN, IF, RETURN, VAR, WHILE)
 
-  def parse(): Try[Expr] =
-    Try { expressionList }
+  def parse(): Try[List[Stmt]] =
+    Try { program }
 
   // program    -> statement* EOF
   private def program =
-    var statements = List.empty[Stmt]
+    var declarations = List.empty[Option[Stmt]]
     while (peek().tokenType != EOF) {
-      statements = statements :: statement
+      declarations = declarations :+ declaration
     }
-    statements
+    declarations.flatten
+
+  // declaration  -> varDecl | statement
+  private def declaration: Option[Stmt] =
+    try {
+      if (matchTokens(VAR)) Some(varDecl)
+      else Some(statement)
+    } catch { 
+      case e: ParseError =>
+        synchronize()
+        None
+    }
+
+  // varDecl  -> 'var' identifier ('=' expression)? ";"
+  private def varDecl =
+    val varName = consume(IDENTIFIER, "Expected variable name")
+    var initialisedValue = if (matchTokens(EQUAL)) expression else null
+    consume(SEMICOLON, "Expected ';' after variable declaration")
+    VarDecl(varName, initialisedValue)
 
   // statement  -> exprStmt | printStmt
-  private def statement =
-    if (matchTokens(PRINT))
-      printStmt
-    exprStmt
+  private def statement: Stmt =
+    if (matchTokens(PRINT)) printStmt
+    else exprStmt
 
   // printStmt  -> "print" expression_list
   private def printStmt =
@@ -55,7 +66,7 @@ class Parser(tokens: List[Token]):
   private def exprStmt =
     val expr = expressionList
     consume(SEMICOLON, "Expected an ';' after an expression.")
-    expr
+    Expression(expr)
 
   // expression_list ->  expression (',' expression_list)
   private def expressionList: ExprList = 
@@ -122,6 +133,7 @@ class Parser(tokens: List[Token]):
     case () if matchTokens(TRUE) => Literal(true)
     case () if matchTokens(NIL) => Literal(null)
     case () if matchTokens(STRING, NUMBER) => Literal(previous().literal)
+    case () if matchTokens(IDENTIFIER) => Variable(previous())
     case () if matchTokens(LEFT_PAREN) =>
       val expr = expression
       consume(RIGHT_PAREN, "Expected an ')' after an expression. Did you miss a brace?")
