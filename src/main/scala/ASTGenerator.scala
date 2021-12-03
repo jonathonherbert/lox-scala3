@@ -19,6 +19,7 @@ object ASTGenerator {
       "Binary     :: left: Expr, operator: Token, right: Expr",
       "Grouping   :: expression: Expr",
       "Literal    :: value: String | Double | Boolean",
+      "Logical    :: left: Expr, operator: Token, right: Expr",
       "Variable   :: name: Token",
       "Unary      :: operator: Token, right: Expr"
     ))
@@ -27,7 +28,8 @@ object ASTGenerator {
       "Expression :: expr: Expr",
       "Print      :: expr: Expr",
       "VarDecl    :: name: Token, value: Expr",
-      "Block      :: statements: List[Stmt]"
+      "Block      :: statements: List[Stmt]",
+      "IfStmt     :: expr: Expr, thenStmt: Stmt, elseStmt: Option[Stmt]"
     ))
   }
 

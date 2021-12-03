@@ -55,7 +55,21 @@ class Parser(tokens: List[Token]):
   private def statement: Stmt =
     if (matchTokens(PRINT)) printStmt
     else if (matchTokens(LEFT_BRACE)) block
+    else if (matchTokens(IF)) ifStmt
     else exprStmt
+
+  // ifStmt -> "if"  "(" expression ")" statement ("else" statement)?
+  private def ifStmt =
+    consume(LEFT_PAREN, "Expected '(' after beginning of if statement")
+    val expr = expression
+    consume(RIGHT_PAREN, "Expected ')' after if statement expression")
+    val thenStmt = statement
+    val elseStmt = if (matchTokens(ELSE))
+      Some(statement)
+    else
+      None
+    IfStmt(expr, thenStmt, elseStmt)
+
 
   // block      -> "{" declaration* "}"
   private def block: Block =
@@ -91,13 +105,33 @@ class Parser(tokens: List[Token]):
 
   // assignment -> IDENTIFIER '=' assignment | equality
   private def assignment =
-    val expr = equality
+    val expr = or
 
     (matchTokens(EQUAL), expr) match
       case (true, Variable(name)) =>
         Assign(name, equality)
       case (false, expr) => expr
       case _ => throw Parser.error(previous(), s"Cannot assign to an expression")
+
+  // logic_or -> logic_and ("or" logic_and)*
+  private def or =
+    val leftExpr = and
+    if (matchTokens(OR))
+      val operator = previous()
+      val rightExpr = and
+      Logical(leftExpr, operator, rightExpr)
+    else
+      leftExpr
+
+  // logic_and -> equality ("and" equality)*
+  private def and =
+    val leftExpr = equality
+    if (matchTokens(AND))
+      val operator = previous()
+      val rightExpr = equality
+      Logical(leftExpr, operator, rightExpr)
+    else
+      leftExpr
 
   // equality   -> comparison (('==' | '!=' comparison)*
   private def equality =

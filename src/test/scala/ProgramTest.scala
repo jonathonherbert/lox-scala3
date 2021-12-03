@@ -3,7 +3,7 @@ package lox
 class ProgramTest extends BaseTest {
 
   describe("a program") {
-    it("should run") {
+    it("should run a program with block scoping") {
       (new Lox()).run("""
         var a = "global a";
         var b = "global b";

@@ -24,6 +24,11 @@ object Interpreter {
 			case VarDecl(name, expr) =>
 				environment.set(name.lexeme, evaluateExpr(expr, environment))
 			case Block(stmts) => evaluate(stmts, new Environment(Some(environment)))
+			case IfStmt(expr, thenStmt, elseStmt) =>
+				if (isTruthy(evaluateExpr(expr, environment)))
+					evaluate(List(thenStmt), new Environment(Some(environment)))
+				else
+					elseStmt.map(stmt => evaluate(List(stmt), new Environment(Some(environment))))
 		}
 
 	def evaluateExpr(expr: Expr, env: Environment): LoxValue = expr match
@@ -79,6 +84,16 @@ object Interpreter {
 				null
 			else
 				throw new InterpreterError(s"Cannot ")
+		case Logical(left, operator, right) =>
+			val leftVal = evaluateExpr(left, env)
+			operator.tokenType match
+				case OR =>
+					if (isTruthy(leftVal)) leftVal
+					else evaluateExpr(right, env)
+				case AND =>
+					if (isTruthy(leftVal)) evaluateExpr(right, env)
+					else leftVal
+				case _ => throw new InterpreterError(s"Tried to evaluate an operator, but operator ${operator.tokenType} not supported")
 
 	def isTruthy(value: LoxValue): Boolean = value match
 		case _: Double => false

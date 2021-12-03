@@ -1,12 +1,15 @@
 program         -> declaration* EOF
 declaration     -> varDecl | statement
 varDecl         -> 'var' identifier ('=' expression)? ";"
-statement       -> exprStmt | printStmt | block
+statement       -> exprStmt | printStmt | block | ifStmt
 block           -> "{" declaration* "}"
+ifStmt          -> "if"  "(" expression ")" statement ("else" statement)?
 exprStmt        -> expression_list
 expression_list -> expression (',' expression_list)
 expression      -> assignment
 assignment      -> IDENTIFIER '=' assignment | equality
+logic_or        -> logic_and ("or" logic_and)*
+logic_and       -> equality ("and" equality)*
 equality        -> comparison (('==' | '!=' comparison)*
 comparison      -> term (('>' | '>=' | '<' | '<=') term)*
 term            -> factor (("+" | "-") factor)*
