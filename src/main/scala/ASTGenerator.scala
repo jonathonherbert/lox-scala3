@@ -1,7 +1,9 @@
+package lox
+
 import java.io.PrintWriter
 import java.io.File
 
-object AstGenerator {
+object ASTGenerator {
   def main(args: Array[String]) = {
     if (args.headOption.isEmpty || args.size > 1) {
       println("Usage: scala AstGenerator.scala <output_directory>")
@@ -13,6 +15,7 @@ object AstGenerator {
 
     defineAst("Expr", List(
       "ExprList   :: left: Expr, right: Option[ExprList] = None",
+      "Assign     :: name: Token, value: Expr",
       "Binary     :: left: Expr, operator: Token, right: Expr",
       "Grouping   :: expression: Expr",
       "Literal    :: value: String | Double | Boolean",
@@ -23,7 +26,8 @@ object AstGenerator {
     defineAst("Stmt", List(
       "Expression :: expr: Expr",
       "Print      :: expr: Expr",
-      "VarDecl    :: name: Token, value: Expr"
+      "VarDecl    :: name: Token, value: Expr",
+      "Block      :: statements: List[Stmt]"
     ))
   }
 

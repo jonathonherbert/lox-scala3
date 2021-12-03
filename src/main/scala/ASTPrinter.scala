@@ -7,12 +7,15 @@ import lox.TokenType
 object AstPrinter {
   def programToString(program: List[Stmt]) = program.map(stmtToString).mkString(";\n")
 
-  def stmtToString(stmt: Stmt) = stmt match
+  def stmtToString(stmt: Stmt): String = stmt match
     case Expression(expr) => exprToString(expr)
     case Print(expr) => s"print(${exprToString(expr)})"
     case VarDecl(name, value) => s"= ${name.lexeme} ${exprToString(value)}"
+    case Block(statements) => s"Block start:\n${statements.map(statement => s"\t${stmtToString(statement)}").mkString("\n")}"
 
   def exprToString(expr: Expr): String = expr match
+    case Variable(name) => s"var ${name.lexeme}".trim
+    case Assign(name, expr) => s"reassign ${name.lexeme} to ${exprToString(expr)}"
     case ExprList(expr, maybeExprList) => s"${exprToString(expr)} ${maybeExprList.map(expr => s", ${exprToString(expr)}").getOrElse("")}"
     case Unary(token, literal) => token.lexeme + exprToString(literal)
     case Binary(left, operator, right) => s"${operator.lexeme} ${exprToString(left)} ${exprToString(right)}"

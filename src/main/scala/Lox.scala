@@ -20,7 +20,8 @@ class Lox:
     val parser = new Parser(tokens)
     parser.parse() match {
       case Success(expr) =>
-        println(s"Parsed to ${AstPrinter.programToString(expr)}")
-        // Interpreter.evaluate(expr)
+        println(s"Parsed to: \n${AstPrinter.programToString(expr)}")
+        println("Running program:")
+        println(Interpreter.evaluate(expr))
       case Failure(e) => println(e.getMessage)
     }

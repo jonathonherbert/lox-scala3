@@ -38,7 +38,7 @@ class Parser(tokens: List[Token]):
     try {
       if (matchTokens(VAR)) Some(varDecl)
       else Some(statement)
-    } catch { 
+    } catch {
       case e: ParseError =>
         synchronize()
         None
@@ -51,10 +51,20 @@ class Parser(tokens: List[Token]):
     consume(SEMICOLON, "Expected ';' after variable declaration")
     VarDecl(varName, initialisedValue)
 
-  // statement  -> exprStmt | printStmt
+  // statement  -> exprStmt | printStmt | block
   private def statement: Stmt =
     if (matchTokens(PRINT)) printStmt
+    else if (matchTokens(LEFT_BRACE)) block
     else exprStmt
+
+  // block      -> "{" declaration* "}"
+  private def block: Block =
+    var declarations = List.empty[Option[Stmt]]
+    while (peek().tokenType != RIGHT_BRACE && !isAtEnd) {
+      declarations = declarations :+ declaration
+    }
+    consume(RIGHT_BRACE, "Expected a '}' at the end of a block")
+    Block(declarations.flatten)
 
   // printStmt  -> "print" expression_list
   private def printStmt =
@@ -69,7 +79,7 @@ class Parser(tokens: List[Token]):
     Expression(expr)
 
   // expression_list ->  expression (',' expression_list)
-  private def expressionList: ExprList = 
+  private def expressionList: ExprList =
     var expr = expression
     if (matchTokens(COMMA))
       ExprList(expr, Some(expressionList))
@@ -77,7 +87,17 @@ class Parser(tokens: List[Token]):
       ExprList(expr)
 
   // expression -> equality
-  private def expression = equality
+  private def expression = assignment
+
+  // assignment -> IDENTIFIER '=' assignment | equality
+  private def assignment =
+    val expr = equality
+
+    (matchTokens(EQUAL), expr) match
+      case (true, Variable(name)) =>
+        Assign(name, equality)
+      case (false, expr) => expr
+      case _ => throw Parser.error(previous(), s"Cannot assign to an expression")
 
   // equality   -> comparison (('==' | '!=' comparison)*
   private def equality =
@@ -167,11 +187,12 @@ class Parser(tokens: List[Token]):
 
   private def previous() = tokens(current - 1)
 
-  private def synchronize() =
+  private def synchronize(): Unit =
     advance()
     while(!isAtEnd) {
-      if (previous().tokenType != SEMICOLON)
-        if (skipTypes.contains(peek().tokenType))
-          ()
-        else advance()
+      if (previous().tokenType == SEMICOLON)
+        return
+      if (skipTypes.contains(peek().tokenType))
+        return
+      advance()
     }
