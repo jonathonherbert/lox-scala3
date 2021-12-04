@@ -29,7 +29,9 @@ object ASTGenerator {
       "Print      :: expr: Expr",
       "VarDecl    :: name: Token, value: Expr",
       "Block      :: statements: List[Stmt]",
-      "IfStmt     :: expr: Expr, thenStmt: Stmt, elseStmt: Option[Stmt]"
+      "IfStmt     :: expr: Expr, thenStmt: Stmt, elseStmt: Option[Stmt]",
+      "WhileStmt  :: whileExpr: Expr, doStmt: Stmt",
+      "ForStmt    :: assign: Assign; forExpr: Expr, incrExpr: Expr, stmt: Stmt"
     ))
   }
 

@@ -11,7 +11,14 @@ class Environment(parent: Option[Environment] = None):
 	private val values: Map[String, LoxValue] = Map.empty
 
 	def get(name: String): Option[LoxValue] = values.get(name).orElse(parent.flatMap(_.get(name)))
-	def set(name: String, value: LoxValue) = values += (name -> value)
+	def set(name: String, value: LoxValue): Unit = parent match
+    // Set in the parent, if a value exists.
+		case Some(p) if p.get(name).isDefined => p.set(name, value)
+    // Else, set locally.
+		case _ => values += (name -> value)
+
+	def mkString: String =
+		s"${values} ${parent.map(p =>  s"${p.mkString}").getOrElse("END")}"
 
 class InterpreterError(message: String) extends Exception(message)
 
@@ -29,6 +36,8 @@ object Interpreter {
 					evaluate(List(thenStmt), new Environment(Some(environment)))
 				else
 					elseStmt.map(stmt => evaluate(List(stmt), new Environment(Some(environment))))
+			case WhileStmt(expr, stmt) =>
+				while(isTruthy(evaluateExpr(expr, environment))) evaluate(List(stmt), environment)
 		}
 
 	def evaluateExpr(expr: Expr, env: Environment): LoxValue = expr match
@@ -83,7 +92,8 @@ object Interpreter {
 				env.set(name.lexeme, evaluateExpr(expr, env))
 				null
 			else
-				throw new InterpreterError(s"Cannot ")
+				println(env.mkString)
+				throw new InterpreterError(s"Cannot assign to variable ${name}: it has not been defined")
 		case Logical(left, operator, right) =>
 			val leftVal = evaluateExpr(left, env)
 			operator.tokenType match

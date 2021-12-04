@@ -1,9 +1,11 @@
 program         -> declaration* EOF
 declaration     -> varDecl | statement
 varDecl         -> 'var' identifier ('=' expression)? ";"
-statement       -> exprStmt | printStmt | block | ifStmt
+statement       -> exprStmt | printStmt | block | ifStmt | whenStmt
 block           -> "{" declaration* "}"
+whileStmt       -> "while" "(" expression ")" "do" statement
 ifStmt          -> "if"  "(" expression ")" statement ("else" statement)?
+forStmt         -> "for" "(" varDecl expression expression ")" statement
 exprStmt        -> expression_list
 expression_list -> expression (',' expression_list)
 expression      -> assignment

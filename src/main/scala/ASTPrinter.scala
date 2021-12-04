@@ -13,6 +13,8 @@ object AstPrinter {
     case VarDecl(name, value) => s"= ${name.lexeme} ${exprToString(value)}"
     case Block(statements) => s"Block start:\n${statements.map(statement => s"\t${stmtToString(statement)}").mkString("\n")}"
     case IfStmt(expr, thenStmt, elseStmt) => s"If ${expr} \n  ${thenStmt}\n else ${elseStmt}"
+    case WhileStmt(expr, stmt) => s"While ${expr} \n ${stmtToString(stmt)}"
+
 
   def exprToString(expr: Expr): String = expr match
     case Variable(name) => s"var ${name.lexeme}".trim
