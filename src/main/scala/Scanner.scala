@@ -31,10 +31,18 @@ class Scanner(program: String):
       case '+' => addToken(TokenType.PLUS)
       case ';' => addToken(TokenType.SEMICOLON)
       case '*' => addToken(TokenType.STAR)
-      case '!' => addToken(if (matchChar('=')) TokenType.BANG_EQUAL else TokenType.BANG);
-      case '=' => addToken(if (matchChar('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL);
-      case '<' => addToken(if (matchChar('=')) TokenType.LESS_EQUAL else TokenType.LESS);
-      case '>' => addToken(if (matchChar('=')) TokenType.GREATER_EQUAL else TokenType.GREATER);
+      case '!' =>
+        addToken(if (matchChar('=')) TokenType.BANG_EQUAL else TokenType.BANG);
+      case '=' =>
+        addToken(
+          if (matchChar('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL
+        );
+      case '<' =>
+        addToken(if (matchChar('=')) TokenType.LESS_EQUAL else TokenType.LESS);
+      case '>' =>
+        addToken(
+          if (matchChar('=')) TokenType.GREATER_EQUAL else TokenType.GREATER
+        );
       case '/' =>
         if (matchChar('*'))
           addCommentBlock
@@ -42,15 +50,15 @@ class Scanner(program: String):
           while (peek != '\n' && !isAtEnd) advance
         else
           addToken(TokenType.SLASH)
-      case ' ' => ()
+      case ' '  => ()
       case '\r' => ()
       case '\t' => ()
       case '\n' =>
         line = line + 1
-      case '"' => addString
-      case c if c.isDigit => addNumber
+      case '"'                    => addString
+      case c if c.isDigit         => addNumber
       case c if c.isLetterOrDigit => addIdentifier
-      case c => error(line, s"Unexpected token: ${c}")
+      case c                      => error(line, s"Unexpected token: ${c}")
     }
 
   def addIdentifier =
@@ -72,8 +80,7 @@ class Scanner(program: String):
     while ((peek != '"') && !isAtEnd)
       advance
 
-    if (isAtEnd)
-      error(line, "Unterminated string at end of file")
+    if (isAtEnd) error(line, "Unterminated string at end of file")
     else
       advance
       addToken(TokenType.STRING, program.substring(start + 1, current - 1))
@@ -96,21 +103,20 @@ class Scanner(program: String):
     advance
     advance
 
-
   def advance =
     val previous = current
     current = current + 1
     program(previous)
 
   def matchChar(expected: Char) =
-    if (isAtEnd || program(current) != expected)
-      false
+    if (isAtEnd || program(current) != expected) false
     else
       current = current + 1
       true
 
   def peek = if (isAtEnd) '\u0000' else program(current)
-  def peekNext = if (current + 1 >= program.size) '\u0000' else program.charAt(current + 1)
+  def peekNext =
+    if (current + 1 >= program.size) '\u0000' else program.charAt(current + 1)
 
   def error(line: Int, message: String) = report(line, "", message)
 
